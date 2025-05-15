@@ -1,6 +1,6 @@
 # PIN-POST
 
-# Install
+### Install
 ```
 docker compose up -d
 docker exec -it <id_container> sh
