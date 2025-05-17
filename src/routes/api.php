@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\HashtagController;
@@ -14,6 +15,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/who', [AuthController::class, 'who']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //чисто пример как юзать
+    Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
+        Route::get("/admin", [AuthController::class, 'admin']);
+    });
 
     Route::get('/images', [ImageController::class, 'index']);                      // все изображения
     Route::get('/images/{id}', [ImageController::class, 'show']);                  // одно изображение с деталями

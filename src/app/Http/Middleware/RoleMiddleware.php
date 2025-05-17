@@ -9,11 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    protected array $roleMap = [
-        1 => 'user',
-        2 => 'moderator',
-        3 => 'admin',
-    ];
     /**
      * Handle an incoming request.
      *
