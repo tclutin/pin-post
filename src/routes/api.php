@@ -12,6 +12,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::get('/images', [ImageController::class, 'index']);                      // все изображения
     Route::get('/images/{id}', [ImageController::class, 'show']);                  // одно изображение с деталями
     Route::post('/images', [ImageController::class, 'store']);                     // создать изображение

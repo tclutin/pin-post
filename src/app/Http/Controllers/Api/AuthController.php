@@ -31,7 +31,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $user->createToken('main')->plainTextToken
-        ]);
+        ], 201);
     }
 
     public function login(Request $request)
@@ -51,5 +51,12 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $user->createToken('main')->plainTextToken
         ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'you have successfully logged out']);
     }
 }
