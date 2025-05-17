@@ -59,4 +59,11 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'you have successfully logged out']);
     }
+
+    public function who(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+
 }
