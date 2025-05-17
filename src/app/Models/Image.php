@@ -3,12 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
-class Image extends Model
-{
-   namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Image extends Model
@@ -47,6 +41,4 @@ class Image extends Model
     {
         return $this->hasMany(Like::class);
     }
-}
-
 }
