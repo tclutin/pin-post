@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\CategoryController;
 
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/images', [ImageController::class, 'index']);                      // все изображения
@@ -21,7 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/images/category/{categoryId}', [ImageController::class, 'imagesByCategory']); // по категории
 
     // комментарии
-    Route::post('/images/{imageId}/comments', [CommentController::class, 'store']); 
+    Route::post('/images/{imageId}/comments', [CommentController::class, 'store']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
 
     // хештеги

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 
 class AuthController extends Controller
@@ -26,11 +27,29 @@ class AuthController extends Controller
             'role_id' => 1
         ]);
 
-        $token = $user->createToken('main')->plainTextToken;
 
         return response()->json([
             'user' => $user,
-            'token' => $token
+            'token' => $user->createToken('main')->plainTextToken
+        ]);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'user not found'], 404);
+        }
+
+        return response()->json([
+            'user' => $user,
+            'token' => $user->createToken('main')->plainTextToken
         ]);
     }
 }
