@@ -22,7 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
+        'is_banned',
+        'banned_date',
     ];
 
     /**
@@ -46,5 +48,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+     public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(Image::class, 'author_id');
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function deletedImages()
+    {
+        return $this->hasMany(Image::class, 'deleted_by');
     }
 }
