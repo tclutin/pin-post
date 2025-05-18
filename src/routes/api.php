@@ -50,5 +50,6 @@ Route::middleware(['auth:sanctum', BannedMiddleware::class])->group(function () 
     });
     Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
         Route::post("/users/{id}/ban", [AdminController::class, 'ban']);
+        Route::post("/users/{id}/unban", [AdminController::class, 'unban']);
     });
 });

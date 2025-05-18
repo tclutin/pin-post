@@ -45,4 +45,16 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'User banned successfully']);
     }
+
+    public function unban(Request $request, $userId)
+    {
+        $user = User::findOrFail($userId);
+        
+        $user->update([
+            'is_banned' => false,
+            'banned_date' => NULL
+        ]);
+
+        return response()->json(['message' => 'User unbanned successfully']);
+    }
 }
