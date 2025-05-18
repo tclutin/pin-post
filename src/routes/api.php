@@ -47,4 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware([RoleMiddleware::class.':admin'])->group(function () {
         Route::post("/users/{id}/assign-role", [AdminController::class, 'assignRole']);
     });
+    Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
+        Route::post("/users/{id}/ban", [AdminController::class, 'ban']);
+    });
 });

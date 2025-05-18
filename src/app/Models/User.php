@@ -73,4 +73,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Image::class, 'deleted_by');
     }
+
+    public function isAdmin()
+    {
+        return $this->role_id === 3;
+    }
+
+    public function isModerator()
+    {
+        return $this->role_id === 2;
+    }
+
+    public function isUser()
+    {
+        return $this->role_id === 1;
+    }
 }

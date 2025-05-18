@@ -21,4 +21,23 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Role assigned successfully']);
     }
+
+    public function ban(Request $request, $userId)
+    {
+        $user = User::findOrFail($userId);
+        $logged_user = User::find(Auth::id());
+
+        if ($user->isAdmin()) {
+            return response()->json(['message' => 'Cannot ban the Admin'], 403);
+        } elseif ($user->isModerator() and $logged_user->isModerator()) {
+            return response()->json(['message' => 'Moderator cannot ban another moderator'], 403);
+        }
+        
+        $user->update([
+            'is_banned' => true,
+            'banned_date' => now()
+        ]);
+
+        return response()->json(['message' => 'User banned successfully']);
+    }
 }
