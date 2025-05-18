@@ -16,6 +16,11 @@ class AdminController extends Controller
         ]);
 
         $user = User::findOrFail($userId);
+
+        if ($user->isAdmin()) {
+            return response()->json(['message' => 'это админ, его трогать нельзя'], 403);
+        }
+
         $user->role_id = $request->role_id;
         $user->save();
 
