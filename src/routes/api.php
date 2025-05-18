@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\BannedMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\HashtagController;
@@ -13,7 +14,7 @@ use App\Http\Controllers\Api\AdminController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', BannedMiddleware::class])->group(function () {
     Route::get('/who', [AuthController::class, 'who']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
