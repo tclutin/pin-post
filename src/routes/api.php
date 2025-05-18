@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\HashtagController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\AdminController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -15,11 +16,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/who', [AuthController::class, 'who']);
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    //чисто пример как юзать
-    Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
-        Route::get("/admin", [AuthController::class, 'admin']);
-    });
 
     Route::get('/images', [ImageController::class, 'index']);                      // все изображения
     Route::get('/images/{id}', [ImageController::class, 'show']);                  // одно изображение с деталями
@@ -46,4 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/categories', [CategoryController::class, 'index']);// список категорий
     Route::post('/images/{imageId}/category', [CategoryController::class, 'addToImage']);// привязать категорию
     Route::delete('/images/{imageId}/category', [CategoryController::class, 'removeFromImage']);// отвязать категорию
+
+    //админка
+    Route::middleware([RoleMiddleware::class.':admin'])->group(function () {
+        Route::post("/users/{id}/assign-role", [AdminController::class, 'assignRole']);
+    });
 });
