@@ -39,7 +39,7 @@ class ImageController extends Controller
         $validator = Validator::make($request->all(), [
             //'image_path' => 'required|string',
             'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         if ($validator->fails()) {

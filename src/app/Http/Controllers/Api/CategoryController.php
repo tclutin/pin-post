@@ -18,7 +18,7 @@ class CategoryController extends Controller
         return response()->json($categories);
     }
 
-    // добавить категорию к изображению
+    // добавить/изменить категорию изображения
     public function addToImage(Request $request, $imageId)
     {
         $validator = Validator::make($request->all(), [
