@@ -46,10 +46,11 @@ Route::middleware(['auth:sanctum', BannedMiddleware::class])->group(function () 
 
     //админка
     Route::middleware([RoleMiddleware::class.':admin'])->group(function () {
-        Route::post("/users/{id}/assign-role", [AdminController::class, 'assignRole']);
+        Route::post("/admin/users/{id}/assign-role", [AdminController::class, 'assignRole']);  // назначить роль
     });
     Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
-        Route::post("/users/{id}/ban", [AdminController::class, 'ban']);
-        Route::post("/users/{id}/unban", [AdminController::class, 'unban']);
+        Route::post("/admin/users/{id}/ban", [AdminController::class, 'ban']);                 // забанить пользователя
+        Route::post("/admin/users/{id}/unban", [AdminController::class, 'unban']);             // разбанить пользователя
+        Route::delete("/admin/images/{id}", [AdminController::class, 'banImage']);             // забанить (удалить) фото
     });
 });

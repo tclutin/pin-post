@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -56,5 +57,26 @@ class AdminController extends Controller
         ]);
 
         return response()->json(['message' => 'User unbanned successfully']);
+    }
+
+    public function banImage(Request $request, $imageId) 
+    {
+        $image = Image::find($imageId);
+
+        if (!$image) {
+            return response()->json(['message' => 'Image not found'], 404);
+        }
+
+        $user = User::findOrFail($image->author_id);
+
+        if($user->isAdmin()) {
+            return response()->json(['message' => 'Cannot ban image from Admin'], 403);
+        }
+
+        $image->deleted_by = Auth::id();
+        $image->save();
+        $image->delete();
+
+        return response()->json(['message' => 'Image banned']);
     }
 }
