@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Image;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -78,5 +79,24 @@ class AdminController extends Controller
         $image->delete();
 
         return response()->json(['message' => 'Image banned']);
+    }
+
+    public function banComment(Request $request, $commentId) 
+    {
+        $comment = Comment::find($commentId);
+
+        if (!$comment) {
+            return response()->json(['message' => 'Comment not found'], 404);
+        }
+
+        $user = User::findOrFail($comment->user_id);
+
+        if($user->isAdmin()) {
+            return response()->json(['message' => 'Cannot ban comment from Admin'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json(['message' => 'Comment banned']);
     }
 }

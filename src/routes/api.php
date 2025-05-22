@@ -52,5 +52,6 @@ Route::middleware(['auth:sanctum', BannedMiddleware::class])->group(function () 
         Route::post("/admin/users/{id}/ban", [AdminController::class, 'ban']);                 // забанить пользователя
         Route::post("/admin/users/{id}/unban", [AdminController::class, 'unban']);             // разбанить пользователя
         Route::delete("/admin/images/{id}", [AdminController::class, 'banImage']);             // забанить (удалить) фото
+        Route::delete("/admin/comments/{id}", [AdminController::class, 'banComment']);  
     });
 });
