@@ -42,9 +42,8 @@ class ImageController extends Controller
         $perPage = 15;
         $images = $query->paginate($perPage);
 
-        // Добавляем URL к каждому изображению
         $images->getCollection()->transform(function ($image) {
-            $image->image_url = $image->image_path ? Storage::url($image->image_path) : null;
+            $image->image_url = Storage::disk('minio')->url($image->image_path);
             return $image;
         });
 
@@ -61,10 +60,10 @@ class ImageController extends Controller
             'hashtags'
         ])->findOrFail($id);
 
-        $response = $image->toArray();
-        $response['image_url'] = $image->image_url;
-
-        return response()->json($response);
+        return response()->json([
+            ...$image->toArray(),
+            'image_url' => Storage::disk('minio')->url($image->image_path)
+        ]);
     }
 
     public function store(Request $request)
@@ -84,7 +83,7 @@ class ImageController extends Controller
         $file = $request->file('image');
         $filename = 'img_'.time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
 
-        $path = $file->storeAs('uploads/images', $filename, 'public');
+        $path = $file->storeAs('uploads/images', $filename, 'minio');
 
         $image = Image::create([
             'author_id' => Auth::id(),
@@ -137,7 +136,7 @@ class ImageController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        Storage::disk('public')->delete($image->image_path);
+        Storage::disk('minio')->delete($image->image_path);
 
         $image->deleted_by = Auth::id();
         $image->save();
