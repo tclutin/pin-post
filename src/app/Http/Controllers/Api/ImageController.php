@@ -6,14 +6,49 @@ use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $images = Image::with(['author', 'category', 'comments'])->latest()->get();
+        $request->validate([
+            'page' => 'sometimes|integer|min:1',
+            'sort' => 'sometimes|in:newest,popular',
+            'category' => 'sometimes|exists:categories,id',
+            'hashtag' => 'sometimes|exists:hashtags,id',
+        ]);
 
-        return response()->json($images);
+        $query = Image::with(['author', 'category', 'comments.user', 'likes', 'hashtags'])
+            ->withCount('likes')
+            ->withCount('comments');
+
+        if ($request->sort === 'popular') {
+            $query->orderBy('likes_count', 'desc');
+        } else {
+            $query->latest();
+        }
+
+        if ($request->has('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        if ($request->has('hashtag')) {
+            $query->whereHas('hashtags', function($q) use ($request) {
+                $q->where('id', $request->hashtag);
+            });
+        }
+
+        $perPage = 15;
+        $images = $query->paginate($perPage);
+
+        // Добавляем URL к каждому изображению
+        $images->getCollection()->transform(function ($image) {
+            $image->image_url = $image->image_path ? Storage::url($image->image_path) : null;
+            return $image;
+        });
+
+        return $images;
     }
 
     public function show($id)
@@ -24,37 +59,45 @@ class ImageController extends Controller
             'comments.user',
             'likes',
             'hashtags'
-        ])->find($id);
+        ])->findOrFail($id);
 
-        if (!$image) {
-            return response()->json(['message' => 'Image not found'], 404);
-        }
+        $response = $image->toArray();
+        $response['image_url'] = $image->image_url;
 
-        return response()->json($image);
+        return response()->json($response);
     }
-
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            //'image_path' => 'required|string',
-            'description' => 'nullable|string',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
+            'description' => 'nullable|string|max:2000',
             'category_id' => 'nullable|exists:categories,id',
+            'hashtags' => 'nullable|array',
+            'hashtags.*' => 'exists:hashtags,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $file = $request->file('image');
+        $filename = 'img_'.time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+
+        $path = $file->storeAs('uploads/images', $filename, 'public');
+
         $image = Image::create([
-            'author_id'   => Auth::id(),
-            //'image_path'  => $request->input('image_path'), 
-            'image_path'  => 'src', 
-            'description' => $request->input('description'),
-            'category_id' => $request->input('category_id'),
+            'author_id' => Auth::id(),
+            'image_path' => $path,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
         ]);
 
-        return response()->json($image, 201);
+        if ($request->has('hashtags')) {
+            $image->hashtags()->sync($request->hashtags);
+        }
+
+        return response()->json($image->load(['author', 'category', 'hashtags']), 201);
     }
 
     public function imagesByHashtag($hashtagId)
@@ -67,7 +110,7 @@ class ImageController extends Controller
             'comments.user',
             'likes',
             'hashtags'
-        ])->get();
+        ])->paginate(15);
 
         return response()->json($images);
     }
@@ -81,18 +124,20 @@ class ImageController extends Controller
                 'comments.user',
                 'likes',
                 'hashtags'
-            ])->get();
+            ])->paginate(15);
 
         return response()->json($images);
     }
 
     public function destroy($id)
     {
-        $image = Image::find($id);
+        $image = Image::findOrFail($id);
 
-        if (!$image) {
-            return response()->json(['message' => 'Image not found'], 404);
+        if ($image->author_id !== Auth::id() && !Auth::user()->hasRole(['admin', 'moderator'])) {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
+
+        Storage::disk('public')->delete($image->image_path);
 
         $image->deleted_by = Auth::id();
         $image->save();
