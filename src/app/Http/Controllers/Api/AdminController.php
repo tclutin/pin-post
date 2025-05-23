@@ -99,4 +99,26 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'Comment banned']);
     }
+
+    public function getUserStats(Request $request)
+    {
+        $totalUsers = User::count();
+
+        // количество забаненных пользователей
+        $bannedCount = User::where('is_banned', true)->count();
+        $bannedPercentage = $totalUsers > 0 ? round(($bannedCount / $totalUsers) * 100, 2) : 0;
+
+        // количество админов и модераторов
+        $adminsCount = User::where('role_id', 3)->count();
+        $moderatorsCount = User::where('role_id', 2)->count(); 
+
+        return response()->json([
+            'total_users' => $totalUsers,
+            'banned' => [
+                'count' => $bannedCount,
+                'percentage' => round($bannedPercentage, 2)
+            ],
+            'admins_count' => $adminsCount,
+            'moderators_count' => $moderatorsCount]);
+    }
 }
