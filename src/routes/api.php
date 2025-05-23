@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // изображения
     Route::get('/images/hashtag/{hashtagId}', [ImageController::class, 'imagesByHashtag']);    // по хештегу
     Route::get('/images/category/{categoryId}', [ImageController::class, 'imagesByCategory']); // по категории
+    Route::get('/images/user/{userId}', [ImageController::class, 'imagesByUser']); // по пользовател
 
     // комментарии
     Route::post('/images/{imageId}/comments', [CommentController::class, 'store']);

@@ -100,4 +100,18 @@ class ImageController extends Controller
 
         return response()->json(['message' => 'Image deleted']);
     }
+
+    public function imagesByUser($userId)
+    {
+        $images = Image::where('author_id', $userId)
+            ->with([
+                'author:id,name',
+                'category',
+                'comments.user',
+                'likes',
+                'hashtags'
+            ])->get();
+
+        return response()->json($images);
+    }
 }
