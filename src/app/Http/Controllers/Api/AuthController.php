@@ -17,7 +17,6 @@ class AuthController extends Controller
             'name' => 'required|string|min:5|max:255',
             'email' => 'required|email|min:5|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'role_id' => 'required|exists:roles,id',
         ]);
 
         $user = User::create([
@@ -66,8 +65,35 @@ class AuthController extends Controller
     }
 
 
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'name' => 'sometimes|string|min:3|max:255',
+            'email' => 'sometimes|email|min:5|max:255|unique:users,email,' . $user->id,
+            'password' => 'sometimes|string|min:6|confirmed',
+        ]);
+
+        if (isset($data['name'])) {
+            $user->name = $data['name'];
+        }
+
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
+
+        if (isset($data['password'])) {
+            $user->password = bcrypt($data['password']);
+        }
+
+        $user->save();
+
+        return response()->json(['message' => 'profile updated', 'user' => $user]);
+    }
+
     public function admin(Request $request)
     {
-        return response()->json(['message' => 'все круто брат, это для админа']);
+        return response()->json(['message' => 'alright brat']);
     }
 }

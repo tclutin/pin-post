@@ -16,6 +16,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/who', [AuthController::class, 'who']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::patch('/profile', [AuthController::class, 'updateProfile']);
+
     //чисто пример как юзать
     Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
         Route::get("/admin", [AuthController::class, 'admin']);
