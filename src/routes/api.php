@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/images/{id}', [ImageController::class, 'show']); // открыть
     Route::post('/images', [ImageController::class, 'store']); // загрузить
     Route::delete('/images/{id}', [ImageController::class, 'destroy']); // удалить
+    Route::get('/images/user/{userId}', [ImageController::class, 'imagesByUser']); // по пользовател
 
     // комментарии
     Route::post('/images/{imageId}/comments', [CommentController::class, 'store']);
@@ -42,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/hashtags', [HashtagController::class, 'create']); // создать
     Route::post('/images/{imageId}/hashtags', [HashtagController::class, 'attachToImage']); // привязать
     Route::delete('/images/{imageId}/hashtags', [HashtagController::class, 'detachFromImage']);// отвязать
+    Route::get('/hashtags', [HashtagController::class, 'index']);
 
     // лайки
     Route::post('/images/{imageId}/likes', [LikeController::class, 'store']);

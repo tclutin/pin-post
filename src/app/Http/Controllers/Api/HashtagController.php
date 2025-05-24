@@ -10,18 +10,37 @@ use Illuminate\Support\Facades\Validator;
 
 class HashtagController extends Controller
 {
+    public function index()
+    {
+        $hashtags = Hashtag::orderBy('id', 'desc')->limit(5)->get();
+        return response()->json($hashtags);
+    }
     // создать новый хештег
     public function create(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:100|unique:hashtags,name',
+            'name' => 'required|string|max:100',
         ]);
+
+        $existing = Hashtag::where('name', $request->input('name'))->first();
+
+        if ($existing) {
+            return response()->json([
+                'id' => $existing->id,
+                'name' => $existing->name,
+                'existing' => true
+            ], 200);
+        }
 
         $hashtag = Hashtag::create([
             'name' => $request->input('name'),
         ]);
 
-        return response()->json($hashtag, 201);
+        return response()->json([
+            'id' => $hashtag->id,
+            'name' => $hashtag->name,
+            'existing' => false
+        ], 201);
     }
 
     // привязать существующий хештег к изображению

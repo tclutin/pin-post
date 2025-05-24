@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Image extends Model
 {
     use SoftDeletes;
-
     protected $fillable = [
         'author_id',
         'image_path',
@@ -47,4 +46,5 @@ class Image extends Model
     {
         return $this->image_path ? Storage::disk('minio')->url($this->image_path) : null;
     }
+    
 }

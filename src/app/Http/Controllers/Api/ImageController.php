@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
-    public function index(Request $request)
+     public function index(Request $request)
     {
         $request->validate([
             'page' => 'sometimes|integer|min:1',
@@ -95,6 +95,9 @@ class ImageController extends Controller
         if ($request->has('hashtags')) {
             $image->hashtags()->sync($request->hashtags);
         }
+        
+        $image->load(['author', 'category', 'hashtags']);
+        $image->image_url = Storage::disk('minio')->url($image->image_path);
 
         return response()->json($image->load(['author', 'category', 'hashtags']), 201);
     }
@@ -143,5 +146,23 @@ class ImageController extends Controller
         $image->delete();
 
         return response()->json(['message' => 'Image deleted']);
+    }
+
+    public function imagesByUser($userId)
+    {
+        $images = Image::where('author_id', $userId)
+            ->with([
+                'author:id,name',
+                'category',
+                'comments.user',
+                'likes',
+                'hashtags'
+            ])->get()
+            ->map(function ($image) {
+                $image->image_url = Storage::disk('minio')->url($image->image_path);
+                return $image;
+            });
+
+        return response()->json($images);
     }
 }
