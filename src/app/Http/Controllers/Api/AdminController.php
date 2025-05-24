@@ -142,4 +142,41 @@ class AdminController extends Controller
             'likes_count' => $likesCount
         ]);
     }
+
+    public function getRegistrationPlot(Request $request) 
+    {
+        $period = $request->input('period', 'week'); // week/month/year
+    
+        $query = User::query();
+        
+        switch($period) {
+            case 'month':
+                $data = $query->selectRaw("to_char(created_at, 'YYYY-MM-DD') as date, COUNT(*) as count")
+                    ->where('created_at', '>=', now()->subMonth())
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get();
+                break;
+                
+            case 'year':
+                $data = $query->selectRaw("to_char(created_at, 'YYYY-MM') as date, COUNT(*) as count")
+                    ->where('created_at', '>=', now()->subYear())
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get();
+                break;
+                
+            default: // week
+                $data = $query->selectRaw("to_char(created_at, 'YYYY-MM-DD') as date, COUNT(*) as count")
+                    ->where('created_at', '>=', now()->subWeek())
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get();
+        }
+        return response()->json([
+            'x' => $data->pluck('date'),
+            'y' => $data->pluck('count'),
+            'period' => $period
+        ]);
+    }
 }
