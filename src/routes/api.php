@@ -29,6 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // изображения
     Route::get('/images/hashtag/{hashtagId}', [ImageController::class, 'imagesByHashtag']);    // по хештегу
     Route::get('/images/category/{categoryId}', [ImageController::class, 'imagesByCategory']); // по категории
+    Route::get('/images', [ImageController::class, 'index']); // с параметрами запроса: ?page=int&sort=newest|popular&category=int&hashtag=int
+    Route::get('/images/{id}', [ImageController::class, 'show']); // открыть
+    Route::post('/images', [ImageController::class, 'store']); // загрузить
+    Route::delete('/images/{id}', [ImageController::class, 'destroy']); // удалить
 
     // комментарии
     Route::post('/images/{imageId}/comments', [CommentController::class, 'store']);
