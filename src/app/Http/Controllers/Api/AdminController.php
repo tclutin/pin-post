@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Image;
 use App\Models\Comment;
+use App\Models\Likes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -106,7 +107,6 @@ class AdminController extends Controller
 
         // количество забаненных пользователей
         $bannedCount = User::where('is_banned', true)->count();
-        $bannedPercentage = $totalUsers > 0 ? round(($bannedCount / $totalUsers) * 100, 2) : 0;
 
         // количество админов и модераторов
         $adminsCount = User::where('role_id', 3)->count();
@@ -114,11 +114,32 @@ class AdminController extends Controller
 
         return response()->json([
             'total_users' => $totalUsers,
-            'banned' => [
-                'count' => $bannedCount,
-                'percentage' => round($bannedPercentage, 2)
+            'banned' => $bannedCount,
+            'admins' => $adminsCount,
+            'moderators' => $moderatorsCount]);
+    }
+
+    public function getLastWeekStats(Request $request)
+    {
+        $lastWeek = now()->subWeek();
+
+        // статистика по картинкам
+        $totalImages = Image::where('created_at', '>=', $lastWeek)->count();
+        $bannedImages = Image::onlyTrashed()->where('deleted_at', '>=', $lastWeek)->count();
+
+        // статистика по комментариям
+        $commentsCount = Comment::where('created_at', '>=', $lastWeek)->count();
+
+        // статистика по лайкам
+        $likesCount = Likes::where('created_at', '>=', $lastWeek)->count();
+
+        return response()->json([
+            'images' => [
+                'total' => $totalImages,
+                'banned' => $bannedImages
             ],
-            'admins_count' => $adminsCount,
-            'moderators_count' => $moderatorsCount]);
+            'comments_count' => $commentsCount,
+            'likes_count' => $likesCount
+        ]);
     }
 }

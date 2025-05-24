@@ -48,6 +48,7 @@ Route::middleware(['auth:sanctum', BannedMiddleware::class])->group(function () 
     Route::middleware([RoleMiddleware::class.':admin'])->group(function () {
         Route::post("/admin/users/{id}/assign-role", [AdminController::class, 'assignRole']);  // назначить роль
         Route::get("/admin/stats/users", [AdminController::class, 'getUserStats']);            // получить статы по пользователям
+        Route::get("/admin/stats/week_stats", [AdminController::class, 'getLastWeekStats']);   // получить статы за неделю
     });
     Route::middleware([RoleMiddleware::class.':admin,moderator'])->group(function () {
         Route::post("/admin/users/{id}/ban", [AdminController::class, 'ban']);                 // забанить пользователя
