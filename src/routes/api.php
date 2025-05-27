@@ -12,6 +12,11 @@ use App\Http\Controllers\Api\CategoryController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// с параметрами запроса: ?author=string&description=string&category=int&hashtag=int
+Route::get('/images', [ImageController::class, 'index']);
+
+Route::get('/images/{id}', [ImageController::class, 'show']); // открыть
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/who', [AuthController::class, 'who']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -21,16 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/admin", [AuthController::class, 'admin']);
     });
 
-    Route::get('/images', [ImageController::class, 'index']);                      // все изображения
-    Route::get('/images/{id}', [ImageController::class, 'show']);                  // одно изображение с деталями
-    Route::post('/images', [ImageController::class, 'store']);                     // создать изображение
-    Route::delete('/images/{id}', [ImageController::class, 'destroy']);            // удалить изображение
-
     // изображения
     Route::get('/images/hashtag/{hashtagId}', [ImageController::class, 'imagesByHashtag']);    // по хештегу
     Route::get('/images/category/{categoryId}', [ImageController::class, 'imagesByCategory']); // по категории
-    Route::get('/images', [ImageController::class, 'index']); // с параметрами запроса: ?page=int&sort=newest|popular&category=int&hashtag=int
-    Route::get('/images/{id}', [ImageController::class, 'show']); // открыть
     Route::post('/images', [ImageController::class, 'store']); // загрузить
     Route::delete('/images/{id}', [ImageController::class, 'destroy']); // удалить
     Route::get('/images/user/{userId}', [ImageController::class, 'imagesByUser']); // по пользовател

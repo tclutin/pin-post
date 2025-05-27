@@ -13,21 +13,15 @@ class ImageController extends Controller
      public function index(Request $request)
     {
         $request->validate([
-            'page' => 'sometimes|integer|min:1',
-            'sort' => 'sometimes|in:newest,popular',
             'category' => 'sometimes|exists:categories,id',
             'hashtag' => 'sometimes|exists:hashtags,id',
+            'author' => 'sometimes|string',
+            'description' => 'sometimes|string',
         ]);
 
         $query = Image::with(['author', 'category', 'comments.user', 'likes', 'hashtags'])
             ->withCount('likes')
             ->withCount('comments');
-
-        if ($request->sort === 'popular') {
-            $query->orderBy('likes_count', 'desc');
-        } else {
-            $query->latest();
-        }
 
         if ($request->has('category')) {
             $query->where('category_id', $request->category);
@@ -39,10 +33,17 @@ class ImageController extends Controller
             });
         }
 
-        $perPage = 15;
-        $images = $query->paginate($perPage);
+        if ($request->has('author')) {
+            $query->whereHas('author', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->author . '%');
+            });
+        }
 
-        $images->getCollection()->transform(function ($image) {
+        if ($request->has('description')) {
+            $query->where('description', 'like', '%' . $request->description . '%');
+        }
+
+        $images = $query->get()->map(function ($image) {
             $image->image_url = Storage::disk('minio')->url($image->image_path);
             return $image;
         });
@@ -95,7 +96,7 @@ class ImageController extends Controller
         if ($request->has('hashtags')) {
             $image->hashtags()->sync($request->hashtags);
         }
-        
+
         $image->load(['author', 'category', 'hashtags']);
         $image->image_url = Storage::disk('minio')->url($image->image_path);
 
