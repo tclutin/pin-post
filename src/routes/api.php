@@ -16,6 +16,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/images', [ImageController::class, 'index']);
 
 Route::get('/images/{id}', [ImageController::class, 'show']); // открыть
+Route::get('/hashtags', [HashtagController::class, 'index']); // список хештегов
+Route::get('/categories', [CategoryController::class, 'index']);// список категорий
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/who', [AuthController::class, 'who']);
@@ -41,13 +43,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/hashtags', [HashtagController::class, 'create']); // создать
     Route::post('/images/{imageId}/hashtags', [HashtagController::class, 'attachToImage']); // привязать
     Route::delete('/images/{imageId}/hashtags', [HashtagController::class, 'detachFromImage']);// отвязать
-    Route::get('/hashtags', [HashtagController::class, 'index']);
 
     // лайки
     Route::post('/images/{imageId}/likes', [LikeController::class, 'store']);
 
     // категории
-    Route::get('/categories', [CategoryController::class, 'index']);// список категорий
     Route::post('/images/{imageId}/category', [CategoryController::class, 'addToImage']);// привязать категорию
     Route::delete('/images/{imageId}/category', [CategoryController::class, 'removeFromImage']);// отвязать категорию
 });
