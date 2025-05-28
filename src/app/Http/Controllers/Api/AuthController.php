@@ -64,10 +64,4 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
-
-
-    public function admin(Request $request)
-    {
-        return response()->json(['message' => 'все круто брат, это для админа']);
-    }
 }
