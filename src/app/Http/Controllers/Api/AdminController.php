@@ -33,7 +33,7 @@ class AdminController extends Controller
     public function getUsers(Request $request)
     {
 
-        $users = User::select(['id', 'name', 'email', 'role_id', 'created_at'])
+        $users = User::select(['id', 'name', 'email', 'role_id', 'is_banned', 'created_at'])
                     ->orderBy('created_at', 'desc')
                     ->get(); 
 
