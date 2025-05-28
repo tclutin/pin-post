@@ -30,6 +30,16 @@ class AdminController extends Controller
         return response()->json(['message' => 'Role assigned successfully']);
     }
 
+    public function getUsers(Request $request)
+    {
+
+        $users = User::select(['id', 'name', 'email', 'role_id', 'created_at'])
+                    ->orderBy('created_at', 'desc')
+                    ->get(); 
+
+        return response()->json($users);
+    }
+
     public function ban(Request $request, $userId)
     {
         $user = User::findOrFail($userId);
