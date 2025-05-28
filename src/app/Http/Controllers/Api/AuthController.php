@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Interfaces\AuthServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -11,6 +12,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    private $authService;
+
+    public function __construct(AuthServiceInterface $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -20,37 +28,25 @@ class AuthController extends Controller
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            'role_id' => 1
-        ]);
+        $result = $this->authService->register(
+            $data['name'],
+            $data['email'],
+            $data['password']
+        );
 
-
-        return response()->json([
-            'user' => $user,
-            'token' => $user->createToken('main')->plainTextToken
-        ], 201);
+        return response()->json($result, 201);
     }
 
     public function login(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $result = $this->authService->login($data['email'], $data['password']);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'user not found'], 404);
-        }
-
-        return response()->json([
-            'user' => $user,
-            'token' => $user->createToken('main')->plainTextToken
-        ]);
+        return response()->json($result, 200);
     }
 
     public function logout(Request $request)
