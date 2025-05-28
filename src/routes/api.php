@@ -31,7 +31,7 @@ Route::middleware(['auth:sanctum', BannedMiddleware::class])->group(function () 
     Route::post('/images', [ImageController::class, 'store']); // загрузить
     Route::delete('/images/{id}', [ImageController::class, 'destroy']); // удалить
     Route::get('/images/user/{userId}', [ImageController::class, 'imagesByUser']); // по пользователю
-    Route::match(['put', 'patch'], '/images/{id}', [ImageController::class, 'update']); //  реадактирование изображения
+    Route::match(['put', 'patch'], '/images/{id}', [ImageController::class, 'update']); // реадактирование изображения
 
     // комментарии
     Route::post('/images/{imageId}/comments', [CommentController::class, 'store']);

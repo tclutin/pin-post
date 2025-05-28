@@ -167,7 +167,7 @@ class ImageController extends Controller
         return response()->json($images);
     }
 
-    public function update(Request $request, $id)
+     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'description' => 'nullable|string|max:2000',
