@@ -32,7 +32,7 @@ class AuthService implements AuthServiceInterface {
 
         return [
             'user' => $user,
-            'token' => $user->createToken('main')->plainTextToken
+            'token' => $user->createToken('main')->plainTextToken,
         ];
     }
 }
