@@ -165,4 +165,43 @@ class ImageController extends Controller
 
         return response()->json($images);
     }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'description' => 'nullable|string|max:2000',
+            'category_id' => 'nullable|exists:categories,id',
+            'hashtags' => 'nullable|array',
+            'hashtags.*' => 'exists:hashtags,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $image = Image::findOrFail($id);
+
+        if ($image->author_id !== Auth::id() && !Auth::user()->hasRole(['admin', 'moderator'])) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if ($request->has('description')) {
+            $image->description = $request->description;
+        }
+
+        if ($request->has('category_id')) {
+            $image->category_id = $request->category_id;
+        }
+
+        $image->save();
+
+        if ($request->has('hashtags')) {
+            $image->hashtags()->sync($request->hashtags);
+        }
+
+        $image->load(['author', 'category', 'hashtags']);
+        $image->image_url = Storage::disk('minio')->url($image->image_path);
+
+        return response()->json($image);
+    }
 }

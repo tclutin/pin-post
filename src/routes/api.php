@@ -33,7 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/images/{id}', [ImageController::class, 'show']); // открыть
     Route::post('/images', [ImageController::class, 'store']); // загрузить
     Route::delete('/images/{id}', [ImageController::class, 'destroy']); // удалить
-    Route::get('/images/user/{userId}', [ImageController::class, 'imagesByUser']); // по пользовател
+    Route::get('/images/user/{userId}', [ImageController::class, 'imagesByUser']); // по пользователю
+    Route::match(['put', 'patch'], '/images/{id}', [ImageController::class, 'update']); //  реадактирование изображения
 
     // комментарии
     Route::post('/images/{imageId}/comments', [CommentController::class, 'store']);
