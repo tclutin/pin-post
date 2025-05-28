@@ -23,6 +23,12 @@ services:
       - minio
     ports:
       - "9000:9000"
+      - "1215:1215"  # Swoole HTTP port
+    environment:
+      SWOOLE_HTTP_HOST: "0.0.0.0"
+      SWOOLE_HTTP_PORT: "1215"
+      SWOOLE_HTTP_WORKER_NUM: "4"
+      SWOOLE_HTTP_TASK_WORKER_NUM: "4"
     links:
       - minio
 
