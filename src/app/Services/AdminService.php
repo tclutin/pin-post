@@ -77,7 +77,7 @@ class AdminService implements AdminServiceInterface
         }
 
         $user = User::findOrFail($image->author_id);
-        if ($user->isAdmin()) {
+        if (!$user->id === Auth::id() && $user->isAdmin()) {
             return response()->json(['message' => 'Cannot ban image from Admin'], 403);
         }
 
