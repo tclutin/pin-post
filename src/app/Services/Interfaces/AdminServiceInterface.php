@@ -1,17 +1,18 @@
 <?php
+
 namespace App\Services\Interfaces;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 interface AdminServiceInterface
 {
-    public function assignRole(int $userId, int $roleId): array;
-    public function getUsers(): array;
-    public function banUser(int $userId, int $loggedUserId): array;
-    public function unbanUser(int $userId): array;
-    public function banImage(int $imageId, int $deletedBy): array;
-    public function banComment(int $commentId): array;
-    public function getUserStats(): array;
-    public function getLastWeekStats(): array;
-    public function getRegistrationPlot(string $period): array;
+    public function assignRole(Request $request, $userId);
+    public function getUsers(Request $request);
+    public function ban(Request $request, $userId);
+    public function unban(Request $request, $userId);
+    public function banImage(Request $request, $imageId);
+    public function banComment(Request $request, $commentId);
+    public function getUserStats(Request $request);
+    public function getLastWeekStats(Request $request);
+    public function getRegistrationPlot(Request $request);
 }

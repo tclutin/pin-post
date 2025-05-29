@@ -1,14 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\Interfaces\AdminServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Interfaces\AdminServiceInterface;
 
-class AdminController extends Controller 
+class AdminController extends Controller
 {
-    private $adminService;
+    protected $adminService;
 
     public function __construct(AdminServiceInterface $adminService)
     {
@@ -17,72 +17,46 @@ class AdminController extends Controller
 
     public function assignRole(Request $request, $userId)
     {
-        $request->validate([
-            'role_id' => 'required|integer|exists:roles,id'
-        ]);
-
-        $result = $this->adminService->assignRole($userId, $request->role_id);
-        return $this->jsonResponse($result);
+        return $this->adminService->assignRole($request, $userId);
     }
 
     public function getUsers(Request $request)
     {
-        $users = $this->adminService->getUsers();
-        return response()->json($users);
+        return $this->adminService->getUsers($request);
     }
 
     public function ban(Request $request, $userId)
     {
-        $result = $this->adminService->banUser($userId, Auth::id());
-        return $this->jsonResponse($result);
+        return $this->adminService->ban($request, $userId);
     }
 
     public function unban(Request $request, $userId)
     {
-        $result = $this->adminService->unbanUser($userId);
-        return $this->jsonResponse($result);
+        return $this->adminService->unban($request, $userId);
     }
 
-    public function banImage(Request $request, $imageId) 
+    public function banImage(Request $request, $imageId)
     {
-        $result = $this->adminService->banImage($imageId, Auth::id());
-        return $this->jsonResponse($result);
+        return $this->adminService->banImage($request, $imageId);
     }
 
-    public function banComment(Request $request, $commentId) 
+    public function banComment(Request $request, $commentId)
     {
-        $result = $this->adminService->banComment($commentId);
-        return $this->jsonResponse($result);
+        return $this->adminService->banComment($request, $commentId);
     }
 
     public function getUserStats(Request $request)
     {
-        $stats = $this->adminService->getUserStats();
-        return response()->json($stats);
+        return $this->adminService->getUserStats($request);
     }
 
     public function getLastWeekStats(Request $request)
     {
-        $stats = $this->adminService->getLastWeekStats();
-        return response()->json($stats);
+        return $this->adminService->getLastWeekStats($request);
     }
 
-    public function getRegistrationPlot(Request $request) 
+    public function getRegistrationPlot(Request $request)
     {
-        $period = $request->input('period', 'week');
-        $result = $this->adminService->getRegistrationPlot($period);
-        return response()->json($result);
-    }
-
-    private function jsonResponse(array $result)
-    {
-        $status = $result['status'] ?? 200;
-        $message = $result['message'] ?? '';
-        $data = array_diff_key($result, array_flip(['status', 'message']));
-        
-        return response()->json(
-            !empty($data) ? $data : ['message' => $message],
-            $status
-        );
+        return $this->adminService->getRegistrationPlot($request);
     }
 }
