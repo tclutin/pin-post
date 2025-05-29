@@ -4,7 +4,7 @@
 
 Гирфанов Константин (pepenka)
 
-Земцова Анастасия (Anastasiya Zemtsova)
+Земцова Анастасия (Anastasiya Zemtsova и mibelmay)
 
 Перникова Елизавета (lisa-veta)
 
