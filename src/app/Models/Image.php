@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Image extends Model
 {
     use SoftDeletes;
-
     protected $fillable = [
         'author_id',
         'image_path',
@@ -34,11 +34,17 @@ class Image extends Model
 
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->latest();
     }
 
     public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(Likes::class);
     }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path ? Storage::disk('minio')->url($this->image_path) : null;
+    }
+    
 }

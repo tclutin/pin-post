@@ -1,103 +1,57 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Image;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use App\Services\Interfaces\ImageServiceInterface;
 
 class ImageController extends Controller
 {
-    public function index()
-    {
-        $images = Image::with(['author', 'category', 'comments'])->latest()->get();
+    protected $imageService;
 
-        return response()->json($images);
+    public function __construct(ImageServiceInterface $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
+    public function index(Request $request)
+    {
+        return $this->imageService->index($request);
     }
 
     public function show($id)
     {
-        $image = Image::with([
-            'author',
-            'category',
-            'comments.user',
-            'likes',
-            'hashtags'
-        ])->find($id);
-
-        if (!$image) {
-            return response()->json(['message' => 'Image not found'], 404);
-        }
-
-        return response()->json($image);
+        return $this->imageService->show($id);
     }
-
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            //'image_path' => 'required|string',
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $image = Image::create([
-            'author_id'   => Auth::id(),
-            //'image_path'  => $request->input('image_path'), 
-            'image_path'  => 'src', 
-            'description' => $request->input('description'),
-            'category_id' => $request->input('category_id'),
-        ]);
-
-        return response()->json($image, 201);
+        return $this->imageService->store($request);
     }
 
-    public function imagesByHashtag($hashtagId)
+    public function update(Request $request, $id)
     {
-        $images = Image::whereHas('hashtags', function($query) use ($hashtagId) {
-            $query->where('id', $hashtagId);
-        })->with([
-            'author',
-            'category',
-            'comments.user',
-            'likes',
-            'hashtags'
-        ])->get();
-
-        return response()->json($images);
-    }
-
-    public function imagesByCategory($categoryId)
-    {
-        $images = Image::where('category_id', $categoryId)
-            ->with([
-                'author',
-                'category',
-                'comments.user',
-                'likes',
-                'hashtags'
-            ])->get();
-
-        return response()->json($images);
+        return $this->imageService->update($request, $id);
     }
 
     public function destroy($id)
     {
-        $image = Image::find($id);
+        return $this->imageService->destroy($id);
+    }
 
-        if (!$image) {
-            return response()->json(['message' => 'Image not found'], 404);
-        }
+    public function imagesByHashtag($hashtagId)
+    {
+        return $this->imageService->imagesByHashtag($hashtagId);
+    }
 
-        $image->deleted_by = Auth::id();
-        $image->save();
-        $image->delete();
+    public function imagesByCategory($categoryId)
+    {
+        return $this->imageService->imagesByCategory($categoryId);
+    }
 
-        return response()->json(['message' => 'Image deleted']);
+    public function imagesByUser($userId)
+    {
+        return $this->imageService->imagesByUser($userId);
     }
 }
